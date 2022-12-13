@@ -1,0 +1,5 @@
+@import "reset.css";
+
+#map {
+    min-height: 100vh;
+}
