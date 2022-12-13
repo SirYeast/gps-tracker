@@ -1,11 +1,12 @@
 "use strict";
 
 const options = {
-    enableHighAccuracy: true
+    enableHighAccuracy: true,
+    maximumAge: 0
 };
 
 function getCurrentPosition(successCallback) {
-    navigator.geolocation.getCurrentPosition(successCallback, errorHandler, options);
+    navigator.geolocation.watchPosition(successCallback, errorHandler, options);
 }
 
 function errorHandler(error) {
@@ -17,22 +18,28 @@ window.addEventListener("load", function() {
         let map;
         let userMarker;
 
+        mapboxgl.accessToken = "pk.eyJ1IjoibWtvcnpoYW4iLCJhIjoiY2xiZ3JvN3kxMGl6YTN3cXNwejI0YnpnNSJ9.LcyAT6lXudjiJnwDKqbRfA";
+
+        map = new mapboxgl.Map({
+            container: "map",
+            style: "mapbox://styles/mapbox/streets-v12",
+            center: [0, 0],
+            zoom: 13,
+            pitch: 30
+        });
+
+        map.dragPan.disable();
+        map.keyboard.disable();
+        map.scrollZoom.disable();
+        map.doubleClickZoom.disable();
+        map.touchZoomRotate.disable();
+
+        userMarker = new mapboxgl.Marker().setLngLat([0, 0]).addTo(map);
+
         getCurrentPosition(position => {
-            mapboxgl.accessToken = "pk.eyJ1IjoibWtvcnpoYW4iLCJhIjoiY2xiZ3JvN3kxMGl6YTN3cXNwejI0YnpnNSJ9.LcyAT6lXudjiJnwDKqbRfA";
-
-            const { latitude, longitude } = position.coords;
-
-            map = new mapboxgl.Map({
-                container: "map",
-                style: "mapbox://styles/mapbox/streets-v12",
-                center: [longitude, latitude],
-                zoom: 13,
-                pitch: 30
-            });
-
-            userMarker = new mapboxgl.Marker()
-                .setLngLat([longitude, latitude])
-                .addTo(map);
+            const { longitude, latitude } = position.coords;
+            map.setCenter([longitude, latitude]);
+            userMarker.setLngLat([longitude, latitude]);
         });
     }
 });
